@@ -178,14 +178,10 @@ cpu() {
 
 hasDisk() {
 
-  [ -b "/disk" ] && return 0
-  [ -b "/disk1" ] && return 0
-  [ -b "/dev/disk1" ] && return 0
-  [ -b "${DEVICE:-}" ] && return 0
+  [ -s "$(ls /disk*/*.{img,qcow2} 2>/dev/null | head -n1)" ] && return 0
+  [ -b "$(ls /dev/disk* 2>/dev/null | head -n1)" ] && return 0
 
-  [ -z "${DISK_NAME:-}" ] && DISK_NAME="data"
-  [ -s "$STORAGE/$DISK_NAME.img" ]  && return 0
-  [ -s "$STORAGE/$DISK_NAME.qcow2" ] && return 0
+  [ -s "$STORAGE/boot.{img,qcow2}" ]  && return 0
 
   return 1
 }

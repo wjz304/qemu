@@ -679,9 +679,9 @@ if [ -f "$BOOT" ] && [ -s "$BOOT" ]; then
           DISK_OPTS+=$(addMedia "$BOOT" "$MEDIA_TYPE" "$BOOT_INDEX" "0x5")
         fi ;;
     *".img" | *".raw" )
-        DISK_OPTS+=$(createDevice "$BOOT" "$DISK_TYPE" "$BOOT_INDEX" "0x5" "raw" "$DISK_IO" "$DISK_CACHE" "" "") ;;
+        DISK_OPTS+=$(createDevice "$BOOT" "${BOOT_TYPE:=$DISK_TYPE}" "$BOOT_INDEX" "0x5" "raw" "$DISK_IO" "$DISK_CACHE" "" "") ;;
     *".qcow2" )
-        DISK_OPTS+=$(createDevice "$BOOT" "$DISK_TYPE" "$BOOT_INDEX" "0x5" "qcow2" "$DISK_IO" "$DISK_CACHE" "" "") ;;
+        DISK_OPTS+=$(createDevice "$BOOT" "${BOOT_TYPE:=$DISK_TYPE}" "$BOOT_INDEX" "0x5" "qcow2" "$DISK_IO" "$DISK_CACHE" "" "") ;;
     * )
         error "Invalid BOOT image specified, extension \".${BOOT/*./}\" is not recognized!" && exit 80 ;;
   esac
@@ -701,12 +701,12 @@ if [ -f "$RESCUE" ] && [ -s "$RESCUE" ]; then
   DISK_OPTS+=$(addMedia "$RESCUE" "$FALLBACK" "1" "0x6")
 fi
 
-DISK1_FILE="$STORAGE/${DISK_NAME}"
-DISK2_FILE="/storage2/${DISK_NAME}2"
-DISK3_FILE="/storage3/${DISK_NAME}3"
-DISK4_FILE="/storage4/${DISK_NAME}4"
-DISK5_FILE="/storage5/${DISK_NAME}5"
-DISK6_FILE="/storage6/${DISK_NAME}6"
+: "${DISK1_FILE:="/disk1/${DISK_NAME}1"}"
+: "${DISK2_FILE:="/disk2/${DISK_NAME}2"}"
+: "${DISK3_FILE:="/disk3/${DISK_NAME}3"}"
+: "${DISK4_FILE:="/disk4/${DISK_NAME}4"}"
+: "${DISK5_FILE:="/disk5/${DISK_NAME}5"}"
+: "${DISK6_FILE:="/disk6/${DISK_NAME}6"}"
 
 if [ -z "$DISK_FMT" ]; then
   if [ -f "$DISK1_FILE.qcow2" ]; then
@@ -728,38 +728,31 @@ else
   DISK_ALLOC="preallocation=falloc"
 fi
 
-: "${DISK2_SIZE:=""}"
-: "${DISK3_SIZE:=""}"
-: "${DISK4_SIZE:=""}"
-: "${DISK5_SIZE:=""}"
-: "${DISK6_SIZE:=""}"
+: "${DISK1_SIZE:="64G"}"
+: "${DISK2_SIZE:="64G"}"
+: "${DISK3_SIZE:="64G"}"
+: "${DISK4_SIZE:="64G"}"
+: "${DISK5_SIZE:="64G"}"
+: "${DISK6_SIZE:="64G"}"
 
-: "${DEVICE:=""}"        # Docker variables to passthrough a block device, like /dev/vdc1.
+: "${DEVICE1:=""}"        # Docker variables to passthrough a block device, like /dev/vdc1.
 : "${DEVICE2:=""}"
 : "${DEVICE3:=""}"
 : "${DEVICE4:=""}"
 : "${DEVICE5:=""}"
 : "${DEVICE6:=""}"
 
-[ -z "$DEVICE" ] && [ -b "/disk" ] && DEVICE="/disk"
-[ -z "$DEVICE" ] && [ -b "/disk1" ] && DEVICE="/disk1"
-[ -z "$DEVICE2" ] && [ -b "/disk2" ] && DEVICE2="/disk2"
-[ -z "$DEVICE3" ] && [ -b "/disk3" ] && DEVICE3="/disk3"
-[ -z "$DEVICE4" ] && [ -b "/disk4" ] && DEVICE4="/disk4"
-[ -z "$DEVICE5" ] && [ -b "/disk5" ] && DEVICE5="/disk5"
-[ -z "$DEVICE6" ] && [ -b "/disk6" ] && DEVICE6="/disk6"
-
-[ -z "$DEVICE" ] && [ -b "/dev/disk1" ] && DEVICE="/dev/disk1"
+[ -z "$DEVICE1" ] && [ -b "/dev/disk1" ] && DEVICE1="/dev/disk1"
 [ -z "$DEVICE2" ] && [ -b "/dev/disk2" ] && DEVICE2="/dev/disk2"
 [ -z "$DEVICE3" ] && [ -b "/dev/disk3" ] && DEVICE3="/dev/disk3"
 [ -z "$DEVICE4" ] && [ -b "/dev/disk4" ] && DEVICE4="/dev/disk4"
 [ -z "$DEVICE5" ] && [ -b "/dev/disk5" ] && DEVICE5="/dev/disk5"
 [ -z "$DEVICE6" ] && [ -b "/dev/disk6" ] && DEVICE6="/dev/disk6"
 
-if [ -n "$DEVICE" ]; then
-  addDevice "$DEVICE" "$DISK_TYPE" "3" "0xa" || exit $?
+if [ -n "$DEVICE1" ]; then
+  addDevice "$DEVICE1" "$DISK_TYPE" "3" "0xa" || exit $?
 else
-  addDisk "$DISK1_FILE" "$DISK_TYPE" "disk" "$DISK_SIZE" "3" "0xa" "$DISK_FMT" "$DISK_IO" "$DISK_CACHE" || exit $?
+  addDisk "$DISK1_FILE" "$DISK_TYPE" "disk1" "$DISK1_SIZE" "3" "0xa" "$DISK_FMT" "$DISK_IO" "$DISK_CACHE" || exit $?
 fi
 
 if [ -n "$DEVICE2" ]; then

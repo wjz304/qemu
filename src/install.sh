@@ -12,36 +12,6 @@ getBase() {
   return 0
 }
 
-getFolder() {
-
-  local base=""
-  local result="$1"
-
-  if [[ "$result" != *"."* ]]; then
-
-    result="${result,,}"
-
-  else
-
-    base=$(getBase "$result")
-    result="${base%.*}"
-
-    case "${base,,}" in
-
-      *".gz" | *".gzip" | *".xz" | *".7z" | *".zip" | *".rar" | *".lzma" | *".bz" | *".bz2" )
-
-        [[ "$result" == *"."* ]] && result="${result%.*}" ;;
-
-    esac
-
-  fi
-
-  [ -z "$result" ] && result="unknown"
-  echo "$result"
-
-  return 0
-}
-
 moveFile() {
 
   local file="$1"
@@ -321,9 +291,6 @@ if [ -z "$BOOT" ] || [[ "$BOOT" == *"example.com/"* ]]; then
 
 fi
 
-folder=$(getFolder "$BOOT")
-STORAGE="$STORAGE/$folder"
-
 if [ -d "$STORAGE" ]; then
 
   findFile "boot" "img" && return 0
@@ -420,6 +387,16 @@ case "${base,,}" in
 
     rm -f "$STORAGE/$base"
     base="${base%.*}"
+
+    if [ ! -s "$tmp/$base" ]; then
+      for f in "$tmp"/*; do
+        case "${f,,}" in
+          *".iso" | *".img" | *".raw" | *".qcow2" | *".vdi" | *".vhd" | *".vhdx" | *".vmdk" )
+            base=$(basename "$f");
+            break 2;;
+        esac
+      done
+    fi
 
     if [ ! -s "$tmp/$base" ]; then
       rm -rf "$tmp"

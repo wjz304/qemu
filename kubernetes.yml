@@ -32,7 +32,7 @@ spec:
         env:
         - name: BOOT
           value: "mint"
-        - name: DISK_SIZE
+        - name: DISK1_SIZE
           value: "64G"
         ports:
           - containerPort: 8006

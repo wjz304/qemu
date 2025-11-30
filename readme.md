@@ -157,11 +157,11 @@ kubectl apply -f https://raw.githubusercontent.com/qemus/qemu/refs/heads/master/
 
 ### How do I change the size of the disk?
 
-  To expand the default size of 64 GB, add the `DISK_SIZE` setting to your compose file and set it to your preferred capacity:
+  To expand the default size of 64 GB, add the `DISK?_SIZE` setting to your compose file and set it to your preferred capacity:
 
   ```yaml
   environment:
-    DISK_SIZE: "128G"
+    DISK1_SIZE: "128G"
   ```
 
 > [!TIP]
@@ -208,6 +208,7 @@ kubectl apply -f https://raw.githubusercontent.com/qemus/qemu/refs/heads/master/
 
   ```yaml
   environment:
+    BOOT_TYPE: "usb"
     DISK_TYPE: "blk"
   ```
 
@@ -320,8 +321,8 @@ kubectl apply -f https://raw.githubusercontent.com/qemus/qemu/refs/heads/master/
     DISK2_SIZE: "32G"
     DISK3_SIZE: "64G"
   volumes:
-    - ./example2:/storage2
-    - ./example3:/storage3
+    - ./path1:/disk1
+    - ./path2:/disk2
   ```
 
 ### How do I pass-through a disk?
@@ -330,8 +331,8 @@ kubectl apply -f https://raw.githubusercontent.com/qemus/qemu/refs/heads/master/
 
   ```yaml
   devices:
-    - /dev/sdb:/disk1
-    - /dev/sdc1:/disk2
+    - /dev/sdb:/dev/disk1
+    - /dev/sdc1:/dev/disk2
   ```
 
   Use `/disk1` if you want it to become your main drive, and use `/disk2` and higher to add them as secondary drives.
