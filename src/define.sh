@@ -202,6 +202,18 @@ getURL() {
       if [[ "$ret" == "url" ]]; then
         url="https://mirrors.edge.kernel.org/zorinos-isos/18/Zorin-OS-18-Core-64-bit.iso"
       fi ;;
+    "rr" | "rr-"* )
+      name="RR"
+      version=""
+      if [[ "${id,,}" =~ rr-* ]]; then
+        version="$(echo "${id,,}" | sed 's/^rr-//' | sed 's/^[v|V]//g')"
+      else
+        version="$(curl -skL --connect-timeout 10 -w "%{url_effective}" -o /dev/null "https://github.com/RROrg/rr/releases/latest" | awk -F'/' '{print $NF}' | sed 's/^[v|V]//g')"
+      fi
+      [ -z "$version" ] || exit 65
+      if [[ "$ret" == "url" ]]; then
+        url="https://github.com/RROrg/rr/releases/download/${version}/rr-${version}.img.zip"
+      fi ;;
   esac
 
   case "${ret,,}" in
