@@ -214,6 +214,18 @@ getURL() {
       if [[ "$ret" == "url" ]]; then
         url="https://github.com/RROrg/rr/releases/download/${version}/rr-${version}.img.zip"
       fi ;;
+    fn | fn-* )
+      name="fnOS"
+      version=""
+      if [[ "${id,,}" =~ fn-* ]]; then
+        version="$(echo "${id,,}" | sed 's/^fn-//' | sed 's/^[v|V]//g')"
+      else
+        version="1.1.4-1379"
+      fi
+      [ -z "$version" ] || exit 65
+      if [[ "$ret" == "url" ]]; then
+        url="http://thunder.liveupdate.fnnas.com:8080/x86_64/trim/fnos-${version}.iso"
+      fi ;;
   esac
 
   case "${ret,,}" in
@@ -221,7 +233,6 @@ getURL() {
       echo "$name"
       ;;
     "url" )
-
       if [[ "${PLATFORM,,}" != "arm64" ]]; then
         if [ -n "$name" ] && [ -z "$url" ]; then
           error "No image for $name available!"
